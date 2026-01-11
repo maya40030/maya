@@ -1,27 +1,265 @@
 Social Media Dashboard
 
-Overview of a Social Media Dashboard :-
-A social media dashboard is a centralized visual interface that collects, organizes, and displays data from multiple social media platforms in one place. Its main goal is to help users monitor performance, track engagement, analyze growth, and make informed decisions efficiently. Dashboards reduce the need to switch between platforms by presenting key metrics in a single, easy-to-understand layout. This concept is widely used in digital marketing, analytics, and content management environments.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Social Media Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-Role of HTML, CSS, and JavaScript :-
-In a front-end–only dashboard, HTML provides the structural foundation, defining sections such as headers, metric cards, tables, and charts. CSS is responsible for visual presentation, including layout alignment, color themes, spacing, typography, responsiveness, and overall aesthetic appeal. JavaScript handles dynamic behavior, such as updating metrics, animating numbers, filtering data, sorting tables, and simulating real-time status updates. Together, these technologies enable an interactive and visually engaging dashboard experience directly in the browser.
+<style>
+:root {
+  --bg: #0f172a;
+  --card: #1e293b;
+  --accent: #38bdf8;
+  --text: #e5e7eb;
+  --muted: #94a3b8;
+}
 
+* {
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
 
-Dashboard Layout and Visual Structure :-
-A typical social media dashboard layout follows a clear visual hierarchy. At the top, a header section usually displays the dashboard title, platform icons, and a global status indicator. Below this, summary metric cards highlight key performance indicators such as total followers, engagement rate, impressions, and post reach. These cards use large numbers and visual emphasis to allow quick scanning. The main body often contains charts on one side and detailed data tables on the other, enabling both high-level insights and granular analysis. This layout approach aligns with established dashboard design principles.
+body {
+  margin: 0;
+  background: linear-gradient(135deg, #020617, #0f172a);
+  color: var(--text);
+}
 
-Data Metrics and Key Performance Indicators :-
-The dashboard typically presents metrics such as follower growth, likes, comments, shares, impressions, click-through rates, and posting frequency. These indicators help users evaluate content effectiveness and audience behavior. Displaying trends over time allows users to compare performance across days, weeks, or months. Well-designed dashboards avoid information overload by prioritizing actionable metrics rather than raw data.
+.dashboard {
+  max-width: 1166px;
+  margin: auto;
+  padding: 16px;
+}
 
-Tables and Detailed Information Panels :-
-Data tables play a crucial role in presenting detailed post-level information. They commonly include columns such as post title, platform, engagement count, reach, and posting date. Tables allow sorting and structured comparison, making them ideal for performance reviews. Placing detailed tables alongside summary charts supports both strategic and operational analysis, a practice recommended in data visualization standards.
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
 
-Interactivity and User Experience :-
-Interactivity enhances usability and comprehension. Animated metric updates, hover effects, status indicators, and smooth transitions improve user engagement and reduce cognitive load. A well-designed dashboard ensures that visual feedback is clear and consistent, helping users understand system status at a glance. These principles align with established usability heuristics for interface design.
+.status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
 
-Responsiveness and Accessibility :-
-A social media dashboard should be responsive, adapting seamlessly to desktops, tablets, and mobile screens. Flexible layouts, scalable typography, and touch-friendly elements ensure usability across devices. Accessibility considerations—such as readable contrast, clear labels, and logical navigation—are essential for inclusive design and are widely recommended in modern web standards.
+.status span {
+  width: 10px;
+  height: 10px;
+  background: #22c55e;
+  border-radius: 50%;
+  animation: pulse 1.5s infinite;
+}
 
-Purpose and Practical Use :-
-The primary purpose of a social media dashboard is to support data-driven decision-making. It enables marketers, content creators, and organizations to evaluate campaign performance, identify trends, and optimize strategies efficiently. By combining visual summaries with detailed data views, dashboards bridge the gap between analytics and action.
+@keyframes pulse {
+  0% { opacity: 0.4; }
+  50% { opacity: 1; }
+  100% { opacity: 0.4; }
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+.card h3 {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.card .value {
+  font-size: 28px;
+  margin-top: 8px;
+  color: var(--accent);
+}
+
+.main {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+}
+
+.panel {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 16px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+}
+
+th, td {
+  padding: 10px;
+  text-align: left;
+  font-size: 14px;
+}
+
+th {
+  cursor: pointer;
+  color: var(--accent);
+}
+
+tr:nth-child(even) {
+  background: rgba(255,255,255,0.03);
+}
+
+button {
+  background: var(--accent);
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: #020617;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+</style>
+</head>
+
+<body>
+<div class="dashboard">
+  <header>
+    <h2>Social Media Dashboard</h2>
+    <div class="status">
+      <span></span> Live
+    </div>
+  </header>
+
+  <section class="cards">
+    <div class="card">
+      <h3>Total Followers</h3>
+      <div class="value" id="followers">0</div>
+    </div>
+    <div class="card">
+      <h3>Engagement Rate</h3>
+      <div class="value" id="engagement">0%</div>
+    </div>
+    <div class="card">
+      <h3>Posts This Month</h3>
+      <div class="value" id="posts">0</div>
+    </div>
+    <div class="card">
+      <h3>Reach</h3>
+      <div class="value" id="reach">0</div>
+    </div>
+  </section>
+
+  <section class="main">
+    <div class="panel">
+      <h3>Growth Overview</h3>
+      <canvas id="growthChart"></canvas>
+    </div>
+
+    <div class="panel">
+      <h3>Platform Metrics</h3>
+      <button onclick="exportCSV()">Export CSV</button>
+      <table id="dataTable">
+        <thead>
+          <tr>
+            <th onclick="sortTable(0)">Platform</th>
+            <th onclick="sortTable(1)">Followers</th>
+            <th onclick="sortTable(2)">Engagement %</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Instagram</td><td>12000</td><td>4.5</td></tr>
+          <tr><td>Facebook</td><td>9000</td><td>3.2</td></tr>
+          <tr><td>Twitter</td><td>7000</td><td>2.8</td></tr>
+          <tr><td>LinkedIn</td><td>5000</td><td>3.9</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<script>
+const counters = [
+  { id: "followers", value: 33000 },
+  { id: "engagement", value: 3.6, suffix: "%" },
+  { id: "posts", value: 48 },
+  { id: "reach", value: 120000 }
+];
+
+counters.forEach(counter => {
+  let start = 0;
+  const el = document.getElementById(counter.id);
+  const interval = setInterval(() => {
+    start += counter.value / 40;
+    if (start >= counter.value) {
+      el.textContent = counter.value + (counter.suffix || "");
+      clearInterval(interval);
+    } else {
+      el.textContent = Math.floor(start) + (counter.suffix || "");
+    }
+  }, 30);
+});
+
+const ctx = document.getElementById('growthChart');
+new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    datasets: [{
+      label: 'Followers Growth',
+      data: [22000, 24000, 26000, 28500, 30500, 33000],
+      borderWidth: 2,
+      tension: 0.4
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } }
+  }
+});
+
+function sortTable(col) {
+  const table = document.getElementById("dataTable");
+  const rows = Array.from(table.rows).slice(1);
+  const asc = table.dataset.sort !== "asc";
+  rows.sort((a, b) => {
+    const A = a.cells[col].innerText;
+    const B = b.cells[col].innerText;
+    return asc ? A.localeCompare(B, undefined, {numeric:true}) :
+                 B.localeCompare(A, undefined, {numeric:true});
+  });
+  table.dataset.sort = asc ? "asc" : "desc";
+  rows.forEach(r => table.tBodies[0].appendChild(r));
+}
+
+function exportCSV() {
+  let csv = "Platform,Followers,Engagement\n";
+  document.querySelectorAll("#dataTable tbody tr").forEach(row => {
+    csv += [...row.children].map(td => td.innerText).join(",") + "\n";
+  });
+  const blob = new Blob([csv], { type: "text/csv" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "social_dashboard.csv";
+  link.click();
+}
+</script>
+</body>
+</html>
